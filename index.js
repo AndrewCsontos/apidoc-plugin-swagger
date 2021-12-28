@@ -1,6 +1,7 @@
 const path = require('path')
 const fs = require('fs')
 const converter = require('./converters')
+const pathToRegexp = require('path-to-regexp');
 
 let app = {}
 let swaggerObj = {}
@@ -31,6 +32,19 @@ module.exports = {
 let pushKey = null
 let pushMethod = null
 
+function uriPathToSwagger(url) {
+  var pattern = pathToRegexp(url, null);
+  var matches = pattern.exec(url);
+
+  // Surrounds URL parameters with curly brackets -> :email with {email}
+  for (var j = 1; j < matches.length; j++) {
+    var key = matches[j].substr(1);
+    url = url.replace(matches[j], "{"+ key +"}");
+  }
+  return url;
+}
+
+
 // iterate over all elements
 function parserFindElements(elements, element, block, filename) {
   counter++
@@ -43,7 +57,7 @@ function parserFindElements(elements, element, block, filename) {
     const parsedElement = elementParser.parse(element.content, element.source)
 
     if (element.name === 'api') {
-      pushKey = parsedElement.url
+      pushKey = uriPathToSwagger(parsedElement.url);
       pushMethod = String(parsedElement.type).toLowerCase()
       swaggerObj.paths[pushKey] = {}
       swaggerObj.paths[pushKey][pushMethod] = {}
