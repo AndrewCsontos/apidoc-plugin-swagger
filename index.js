@@ -1,7 +1,7 @@
 const path = require('path')
 const fs = require('fs')
 const converter = require('./converters')
-const pathToRegexp = require('path-to-regexp');
+const {pathToRegexp} = require('path-to-regexp');
 
 let app = {}
 let swaggerObj = {}
