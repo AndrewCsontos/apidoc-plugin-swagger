@@ -2,6 +2,7 @@ const path = require('path')
 const fs = require('fs')
 const converter = require('./converters')
 const {pathToRegexp} = require('path-to-regexp');
+const process = require("process")
 
 let app = {}
 let swaggerObj = {}
@@ -75,20 +76,24 @@ function parserFindElements(elements, element, block, filename) {
 }
 
 process.on('exit', (code) => {
-  // triggerd from apidoc when proccess finished successfully
+  // triggered from apidoc when proccess finished successfully
   // TODO: provide callback when apidoc works finished (this event called only when we use cli)
   if (code === 0 && counter > 0 && (process.argv.includes('-o') || process.argv.includes('--output'))) {
     console.log(`[apidoc-plugin-swagger] parse and convert ${counter} element${(counter == 1) ? '' : 's'} to swagger format`)
 
-    function getOutputDir() {
+    function getOutputFile() {
       let outFlagIndex = process.argv.indexOf('-o')
       if (outFlagIndex === -1) {
         outFlagIndex = process.argv.indexOf('--output')
       }
-      return process.argv[outFlagIndex + 1]
+      let outDir = process.argv[outFlagIndex + 1];
+      if (!outDir.startsWith(process.cwd())){
+        outDir = path.join(process.cwd(), outDir);
+      }
+      return  path.join(outDir, 'swagger.json')
     }
 
-    const destinationFilePath = path.join(process.cwd(), getOutputDir(), 'swagger.json')
+    const destinationFilePath = getOutputFile();
     console.log(`[apidoc-plugin-swagger] going to save at path: ${destinationFilePath}`)
 
     fs.writeFileSync(destinationFilePath, JSON.stringify(swaggerObj, null, 2), 'utf8')
