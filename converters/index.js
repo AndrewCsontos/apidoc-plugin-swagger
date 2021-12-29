@@ -6,7 +6,8 @@ const ConvertersMap = {
   apidescription: './api_description.js',
   apiparamexample: './api_param_example.js',
   apisuccessexample: './api_success_example.js',
-  apiparam: './api_param.js'
+  apiparam: './api_param.js',
+  apiquery: './api_query.js'
 }
 
 module.exports.resolve = (elementName) => {

@@ -31,9 +31,60 @@ describe('Test apidoc swagger', () => {
         const swaggerJson = JSON.parse(swaggerFs);
         expect(swaggerJson).toHaveProperty('info.description', 'apidocjs plugin to export swagger openapi specification');
         expect(swaggerJson).toHaveProperty('paths./company/{company}/user/{user}/favorites');
-    
+        const parameters = swaggerJson.paths["/company/{company}/user/{user}/favorites"].get.parameters;
+        expect(swaggerJson).toEqual(
+        {
+            "info": {
+              "title": "My API",
+              "version": "1.0.0",
+              "description": "apidocjs plugin to export swagger openapi specification"
+            },
+            "basePath": "/",
+            "swagger": "2.0",
+            "paths": {
+              "/company/{company}/user/{user}/favorites": {
+                "get": {
+                  "summary": "Request User information",
+                  "tags": [
+                    "User"
+                  ],
+                  "description": "This is a really long description that\n spans multiple lines. and inclues some random things",
+                  "parameters": [
+                    {
+                      "name": "company",
+                      "in": "path",
+                      "required": true,
+                      "description": "CompanyId of the User",
+                      "type": "number"
+                    },
+                    {
+                      "name": "user",
+                      "in": "path",
+                      "required": true,
+                      "description": "Users unique ID.",
+                      "type": "number"
+                    },
+                    {
+                      "name": "optional",
+                      "in": "query",
+                      "required": true,
+                      "description": "Optional query parameter",
+                      "type": "number"
+                    },
+                    {
+                      "name": "isArchived",
+                      "in": "query",
+                      "required": true,
+                      "description": "unique ID.",
+                      "type": "boolean"
+                    }
+                  ]
+                }
+              }
+            },
+            "definitions": {}
+        });
     });
-
 });
 
 

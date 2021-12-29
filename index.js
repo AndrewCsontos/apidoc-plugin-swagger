@@ -7,6 +7,12 @@ const process = require("process")
 let app = {}
 let swaggerObj = {}
 let counter = 0
+
+let pushKey = null; //track the path
+let pushMethod = null //track the current method (get/delete/post/patch)
+let gUrlParams = []; //track the tokens / parameters in the URL
+
+
 /**
  * Hook overview: https://github.com/apidoc/apidoc-core/hooks.md
  */
@@ -30,9 +36,6 @@ module.exports = {
   }
 }
 
-let pushKey = null
-let pushMethod = null
-
 function uriPathToSwagger(url) {
   var pattern = pathToRegexp(url, null);
   var matches = pattern.exec(url);
@@ -40,6 +43,7 @@ function uriPathToSwagger(url) {
   // Surrounds URL parameters with curly brackets -> :email with {email}
   for (var j = 1; j < matches.length; j++) {
     var key = matches[j].substr(1);
+    gUrlParams.push(key);
     url = url.replace(matches[j], "{"+ key +"}");
   }
   return url;
@@ -58,6 +62,7 @@ function parserFindElements(elements, element, block, filename) {
     const parsedElement = elementParser.parse(element.content, element.source)
 
     if (element.name === 'api') {
+      gUrlParams = [];
       pushKey = uriPathToSwagger(parsedElement.url);
       pushMethod = String(parsedElement.type).toLowerCase()
       swaggerObj.paths[pushKey] = {}
@@ -66,7 +71,7 @@ function parserFindElements(elements, element, block, filename) {
 
     // check for supported elements
     if (element.name && Object.keys(converter.ConvertersMap).includes(element.name)) {
-      swaggerObj.paths[pushKey][pushMethod] = converter.resolve(element.name).init(parsedElement, swaggerObj.paths[pushKey][pushMethod])
+      swaggerObj.paths[pushKey][pushMethod] = converter.resolve(element.name).init(parsedElement, swaggerObj.paths[pushKey][pushMethod], gUrlParams)
     }
   } catch (err) {
     console.error('OOPS! errored element: '+JSON.stringify(element.name)+' in filename: '+filename)
