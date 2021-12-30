@@ -67,7 +67,7 @@ describe('Test apidoc swagger', () => {
                     {
                       "name": "optional",
                       "in": "query",
-                      "required": true,
+                      "required": false,
                       "description": "Optional query parameter",
                       "type": "number"
                     },
@@ -78,7 +78,25 @@ describe('Test apidoc swagger', () => {
                       "description": "unique ID.",
                       "type": "boolean"
                     }
-                  ]
+                  ],
+                  "produces": [
+                    "application/json"
+                    ],
+                  "consumes": [
+                    "application/json"
+                    ],
+
+                    "responses": {
+                      "200": {
+                        "description": "Sample Response: type json",
+                        "schema": {
+                          "type": "object",
+                          "example": "HTTP/1.1 200 OK\n{\n    \"data\": {\n        \"id\": \"1\",\n        \"user_id\": 1,\n        \"name\": \"my fave\",\n        \"data\": \"the stringified data\",\n        \"team_id\": 1,\n        \"order\": 0,\n        \"product\": \"my product\"\n    }\n}"
+                        }
+                      }
+                    }
+            
+
                 }
               }
             },
@@ -86,5 +104,6 @@ describe('Test apidoc swagger', () => {
         });
     });
 });
+
 
 
