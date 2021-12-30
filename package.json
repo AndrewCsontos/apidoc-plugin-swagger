@@ -4,7 +4,7 @@
   "description": "apidocjs plugin to export swagger openapi specification",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -23,5 +23,9 @@
   "homepage": "https://github.com/sadeghmohebbi/apidoc-plugin-swagger#readme",
   "dependencies": {
     "apidoc": "^0.29.0"
+  },
+  "devDependencies": {
+    "jest": "^27.4.5",
+    "path-to-regexp": "^6.2.0"
   }
 }
