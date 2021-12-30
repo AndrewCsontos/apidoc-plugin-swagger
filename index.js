@@ -1,10 +1,18 @@
 const path = require('path')
 const fs = require('fs')
 const converter = require('./converters')
+const {pathToRegexp} = require('path-to-regexp');
+const process = require("process")
 
 let app = {}
 let swaggerObj = {}
 let counter = 0
+
+let pushKey = null; //track the path
+let pushMethod = null //track the current method (get/delete/post/patch)
+let gUrlParams = []; //track the tokens / parameters in the URL
+
+
 /**
  * Hook overview: https://github.com/apidoc/apidoc-core/hooks.md
  */
@@ -28,8 +36,19 @@ module.exports = {
   }
 }
 
-let pushKey = null
-let pushMethod = null
+function uriPathToSwagger(url) {
+  var pattern = pathToRegexp(url, null);
+  var matches = pattern.exec(url);
+
+  // Surrounds URL parameters with curly brackets -> :email with {email}
+  for (var j = 1; j < matches.length; j++) {
+    var key = matches[j].substr(1);
+    gUrlParams.push(key);
+    url = url.replace(matches[j], "{"+ key +"}");
+  }
+  return url;
+}
+
 
 // iterate over all elements
 function parserFindElements(elements, element, block, filename) {
@@ -43,7 +62,8 @@ function parserFindElements(elements, element, block, filename) {
     const parsedElement = elementParser.parse(element.content, element.source)
 
     if (element.name === 'api') {
-      pushKey = parsedElement.url
+      gUrlParams = [];
+      pushKey = uriPathToSwagger(parsedElement.url);
       pushMethod = String(parsedElement.type).toLowerCase()
       swaggerObj.paths[pushKey] = {}
       swaggerObj.paths[pushKey][pushMethod] = {}
@@ -51,7 +71,7 @@ function parserFindElements(elements, element, block, filename) {
 
     // check for supported elements
     if (element.name && Object.keys(converter.ConvertersMap).includes(element.name)) {
-      swaggerObj.paths[pushKey][pushMethod] = converter.resolve(element.name).init(parsedElement, swaggerObj.paths[pushKey][pushMethod])
+      swaggerObj.paths[pushKey][pushMethod] = converter.resolve(element.name).init(parsedElement, swaggerObj.paths[pushKey][pushMethod], gUrlParams)
     }
   } catch (err) {
     console.error('OOPS! errored element: '+JSON.stringify(element.name)+' in filename: '+filename)
@@ -61,20 +81,24 @@ function parserFindElements(elements, element, block, filename) {
 }
 
 process.on('exit', (code) => {
-  // triggerd from apidoc when proccess finished successfully
+  // triggered from apidoc when proccess finished successfully
   // TODO: provide callback when apidoc works finished (this event called only when we use cli)
   if (code === 0 && counter > 0 && (process.argv.includes('-o') || process.argv.includes('--output'))) {
     console.log(`[apidoc-plugin-swagger] parse and convert ${counter} element${(counter == 1) ? '' : 's'} to swagger format`)
 
-    function getOutputDir() {
+    function getOutputFile() {
       let outFlagIndex = process.argv.indexOf('-o')
       if (outFlagIndex === -1) {
         outFlagIndex = process.argv.indexOf('--output')
       }
-      return process.argv[outFlagIndex + 1]
+      let outDir = process.argv[outFlagIndex + 1];
+      if (!outDir.startsWith(process.cwd())){
+        outDir = path.join(process.cwd(), outDir);
+      }
+      return  path.join(outDir, 'swagger.json')
     }
 
-    const destinationFilePath = path.join(process.cwd(), getOutputDir(), 'swagger.json')
+    const destinationFilePath = getOutputFile();
     console.log(`[apidoc-plugin-swagger] going to save at path: ${destinationFilePath}`)
 
     fs.writeFileSync(destinationFilePath, JSON.stringify(swaggerObj, null, 2), 'utf8')
