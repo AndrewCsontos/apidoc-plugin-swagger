@@ -7,8 +7,20 @@
  * @apiParam (MyGroup) {Number} company CompanyId of the User
  * @apiParam {Number} user Users unique ID.
  * @apiParam (Query Parameters) {Number} optional Optional query parameter
- * @apiQuery {Boolean} isArchived=false  unique ID.
- *
- * @apiSuccess {String} firstname Firstname of the User.
- * @apiSuccess {String} lastname  Lastname of the User.
+ * @apiQuery {Boolean} isArchived=false unique ID.
+ * @apiSuccess (200) {Object} data
+ * @apiSuccessExample {json} Sample Response:
+ * HTTP/1.1 200 OK
+ * {
+ *     "data": {
+ *         "id": "1",
+ *         "user_id": 1,
+ *         "name": "my fave",
+ *         "data": "the stringified data",
+ *         "team_id": 1,
+ *         "order": 0,
+ *         "product": "my product"
+ *     }
+ * }
  */
+
