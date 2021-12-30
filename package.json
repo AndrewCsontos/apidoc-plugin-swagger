@@ -4,7 +4,8 @@
   "description": "apidocjs plugin to export swagger openapi specification",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "apidoc": "apidoc -i /Users/acsontos/code/test/apidoc-plugin-swagger/test/simple/input -o ./test/simple/output"
   },
   "repository": {
     "type": "git",
