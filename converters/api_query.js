@@ -9,21 +9,10 @@ module.exports.init = (parsedElement, swaggerPathItemObject, urlParameters = [])
     swaggerPathItemObject.parameters = []
   }
 
-  let inValue = 'body';
-  if (parsedElement.group.toLowerCase().includes('query')) {
-    inValue = 'query';
-  } 
-  else if (urlParameters.includes(parsedElement.field)) {
-      inValue = 'path'
-  }
-
-  let required = (inValue == "body") || (inValue === "path")
-
-
   swaggerPathItemObject.parameters.push({
     name: parsedElement.field,
-    in: inValue,
-    required: required && !parsedElement.optional,
+    in: 'query',
+    required: !parsedElement.optional,
     description: parsedElement.description,
     type: String(parsedElement.type).toLowerCase()
   })
