@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "apidoc": "apidoc -i /Users/acsontos/code/test/apidoc-plugin-swagger/test/simple/input -o ./test/simple/output"
+    "apidoc": "apidoc -i ./test/simple/input -o ./test/simple/output"
   },
   "repository": {
     "type": "git",
